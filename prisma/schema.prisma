@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  phone         String?
+  mobilePhone   String?
+  birthDate     DateTime?
+  company       String?
+  jobTitle      String?
+  references    String?
+  role          Role      @default(MEMBER)
+  membershipType MembershipType @relation(fields: [membershipTypeId], references: [id])
+  membershipTypeId String
+  approved      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  events        Event[]
+}
+
+model MembershipType {
+  id            String    @id @default(cuid())
+  name          String
+  price         Float
+  duration      Int       // in months
+  renewalType   RenewalType
+  users         User[]
+}
+
+model Event {
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  date          DateTime
+  location      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  attendees     User[]
+}
+
+model NewsItem {
+  id            String    @id @default(cuid())
+  title         String
+  content       String
+  imageUrl      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+enum RenewalType {
+  MONTHLY
+  ANNUAL
+  FIXED_DATE
+}
